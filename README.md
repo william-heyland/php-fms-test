@@ -16,12 +16,16 @@ Prerequisites
 Task
 ----
 
-You will be creating a “File Management System”. You can use one of the following storage engines:
+You will be creating a “File Management System”.
+
+You can use one of the following storage engines:
 
 - MySQL (Please provide a schema dump)
 - Flat file
 
-Your git repository has three interfaces. Please use these interfaces as the foundation of the task.
+Your git repository has three interfaces, please use these interfaces as the foundation of the task.
+
+You may complete the task in any way you see fit, the resulting system can be either web or CLI based.
 
 Conclusion
 ----------
