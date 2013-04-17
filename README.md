@@ -26,4 +26,4 @@ Your git repository has three interfaces. Please use these interfaces as the fou
 Conclusion
 ----------
 
-In your repository readme file, you should note your experience with the task, and provide some  critique to the codebase as a whole.
+In your repository *PROGRESS* file, you should note your experience with the task, and provide some  critique to the codebase as a whole.
