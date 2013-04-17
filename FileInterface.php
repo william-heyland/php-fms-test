@@ -6,7 +6,7 @@ interface FileInterface
    * @return string
    */
   public function getName();
-  
+
   /**
    * @param string $name
    *
@@ -18,7 +18,7 @@ interface FileInterface
    * @return int
    */
   public function getSize();
-  
+
   /**
    * @param int $size
    *
@@ -30,7 +30,7 @@ interface FileInterface
    * @return DateTime
    */
   public function getCreatedTime();
-  
+
   /**
    * @param DateTime $created
    *
@@ -42,7 +42,7 @@ interface FileInterface
    * @return DateTime
    */
   public function getModifiedTime();
-  
+
   /**
    * @param DateTime $modified
    *
@@ -54,23 +54,16 @@ interface FileInterface
    * @return FolderInterface
    */
   public function getParentFolder();
-  
+
   /**
    * @param FolderInterface $parent
    *
    * @return $this
    */
-  public function setParentFolder($parent);
+  public function setParentFolder(FolderInterface $parent);
 
   /**
    * @return string
    */
   public function getPath();
-  
-  /**
-   * @param string $path
-   *
-   * @return $this
-   */
-  public function setPath($path);
 }
