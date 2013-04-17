@@ -11,7 +11,7 @@ Prerequisites
 - Fork <https://github.com/justdevelopit/php-fms-test>
 - Clone your repository
  - This is where you will document your progress and commit the project
-- Install PHP 5.4
+- Install PHP 5.3 or greater
 
 Task
 ----
