@@ -1,4 +1,4 @@
-JDi Developer Task
+JDI Developer Task
 ==================
 
 Prerequisites
