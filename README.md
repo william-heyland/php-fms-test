@@ -27,6 +27,8 @@ Your git repository has three interfaces, please use these interfaces as the fou
 
 You may complete the task in any way you see fit, the resulting system can be either web or CLI based.
 
+Please **do not** use any third party frameworks.
+
 Conclusion
 ----------
 
