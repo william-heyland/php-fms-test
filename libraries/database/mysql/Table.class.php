@@ -106,7 +106,7 @@ class Table implements DatabaseTableInterface {
     
     /* Build the WHERE clause based on the data provided */
     $SQL_WHERE_CLAUSE = '';
-    $COMA = '';
+    $AND = '';
     foreach ( $where as $key => $value )
     {
       if ( !in_array( $key, $this->table_columns ) )
@@ -114,8 +114,8 @@ class Table implements DatabaseTableInterface {
         throw new Exception('Unknown database column: '.$key, INVALID_INPUT);
       }
 
-      $SQL_WHERE_CLAUSE .= $COMA.' `'.$key."` = '".$this->db_connection->real_escape_string($value)."' ";
-      $COMA = ', ';
+      $SQL_WHERE_CLAUSE .= $AND.' `'.$key."` = '".$this->db_connection->real_escape_string($value)."' ";
+      $AND = ' AND ';
     }
     
     /* Don't allow an UPDATE without a where clause */
@@ -146,7 +146,7 @@ class Table implements DatabaseTableInterface {
 
     /* Build the WHERE clause based on the data provided */
     $SQL_WHERE_CLAUSE = '';
-    $COMA = '';
+    $AND = '';
     foreach ( $where as $key => $value )
     {
       if ( !in_array( $key, $this->table_columns ) )
@@ -154,8 +154,8 @@ class Table implements DatabaseTableInterface {
         throw new Exception('Unknown database column: '.$key, INVALID_INPUT);
       }
 
-      $SQL_WHERE_CLAUSE .= $COMA.' `'.$key."` = '".$this->db_connection->real_escape_string($value)."' ";
-      $COMA = ', ';
+      $SQL_WHERE_CLAUSE .= $AND.' `'.$key."` = '".$this->db_connection->real_escape_string($value)."' ";
+      $AND = ' AND ';
     }
 
     /* Put it all together */
@@ -186,7 +186,7 @@ class Table implements DatabaseTableInterface {
 
     /* Build the WHERE clause based on the data provided */
     $SQL_WHERE_CLAUSE = '';
-    $COMA = '';
+    $AND = '';
     foreach ( $where as $key => $value )
     {
       if ( !in_array( $key, $this->table_columns ) )
@@ -194,8 +194,8 @@ class Table implements DatabaseTableInterface {
         throw new Exception('Unknown database column: '.$key, INVALID_INPUT);
       }
 
-      $SQL_WHERE_CLAUSE .= $COMA.' `'.$key."` = '".$this->db_connection->real_escape_string($value)."' ";
-      $COMA = ', ';
+      $SQL_WHERE_CLAUSE .= $AND.' `'.$key."` = '".$this->db_connection->real_escape_string($value)."' ";
+      $AND = ' AND ';
     }
 
     /* Don't allow a DELETE without a where clause */
