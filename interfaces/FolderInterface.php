@@ -1,5 +1,7 @@
 <?php
 
+if (!defined('SECURED') ) throw new Exception('Attempted security breach', SECURITY_ALERT);
+
 interface FolderInterface
 {
   /**
@@ -24,7 +26,7 @@ interface FolderInterface
    *
    * @return $this
    */
-  public function setCreatedTime($created);
+  public function setCreatedTime(DateTime $created);
 
   /**
    * @return string

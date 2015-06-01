@@ -1,0 +1,59 @@
+#########################################
+# Captains Log entry 1, Stardate 20150529
+#########################################
+
+My initial observations of the 3 interfaces
+===========================================
+a) The FileSystem interface provides methods for creating, updating, and deleting Files and Folders.
+The FileSystem interface thus dictates that it shall handle all interactions with my chosen storage engine.
+
+b) The design of the File and Folder interfaces provide a simple "datatype role" with no direct database interaction.
+The File and Folder interfaces can and should however handle all input validation where possible.
+
+c) The File interface defines the relationship between the file and it's parent Folder Object.
+
+d) However, the Folder interface does not provide any such relationship with it's own parent folder.
+The Folder interface does however allow the path to be set. The path will thus be used to define the location of the folder and it's parent.
+
+My plan
+=======
+1) I will be using the MySQL database storage engine for this project.
+
+2) I will create a separate database interface for my storage engine implementation.
+
+3) I will "normalise" the File and Folder data with the addition of file_id, folder_id, and parent_folder_id fields.
+The external API will remain unchanged.
+The addition of parent_folder_id will enforce the relationship of the data and help ensure data integrity in case of programming errors.
+Note: Under normal circumstances I would discuss this with you first, but since it's now the weekend and this is a TEST project, I hope this is OK.
+
+#########################################
+# Captains Log entry 2, Stardate 20150531
+#########################################
+
+Observations
+============
+a) The File and Folder interfaces specify a time parameter type of DateTime yet do not enforce this in the method declaration.
+I have added the 'DateTime' datatype specification.
+
+Progress
+========
+1) Progress is going well, I have completed a lot of the "back-end" functionality.
+I need to further test and review the code I have written and check for errors.
+
+2) I have added 2 new Database interfaces files and implemented a basic mysql database storage framework.
+
+3) I still need to write data input validation code for the File and Folder classes.
+
+4) If necessary, I need to decide on an interactive "front-end" to the filesystem (check with Richard?)
+
+#########################################
+# Captains Log entry 3, Stardate 20150601
+#########################################
+
+Progress
+========
+1) Input validation is complete
+
+2) I have further tested and verified that all the File, Folder, and FileSystem methods are working as intended
+
+3) I am ready to decide on an inteface?

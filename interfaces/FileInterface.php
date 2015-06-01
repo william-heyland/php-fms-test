@@ -1,5 +1,7 @@
 <?php
 
+if (!defined('SECURED') ) throw new Exception('Attempted security breach', SECURITY_ALERT);
+
 interface FileInterface
 {
   /**
@@ -18,7 +20,7 @@ interface FileInterface
    * @return int
    */
   public function getSize();
-
+  
   /**
    * @param int $size
    *
@@ -36,7 +38,7 @@ interface FileInterface
    *
    * @return $this
    */
-  public function setCreatedTime($created);
+  public function setCreatedTime(DateTime $created);
 
   /**
    * @return DateTime
@@ -48,7 +50,7 @@ interface FileInterface
    *
    * @return $this
    */
-  public function setModifiedTime($modified);
+  public function setModifiedTime(DateTime $modified);
 
   /**
    * @return FolderInterface

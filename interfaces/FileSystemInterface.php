@@ -1,5 +1,7 @@
 <?php
 
+if (!defined('SECURED') ) throw new Exception('Attempted security breach', SECURITY_ALERT);
+
 /**
  * File System Management
  */
@@ -48,9 +50,7 @@ interface FileSystemInterface
    *
    * @return FolderInterface
    */
-  public function createFolder(
-    FolderInterface $folder, FolderInterface $parent
-  );
+  public function createFolder( FolderInterface $folder, FolderInterface $parent );
 
   /**
    * @param FolderInterface $folder
