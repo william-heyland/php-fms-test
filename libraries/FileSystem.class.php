@@ -1,6 +1,14 @@
 <?php
+/* Give the project it's own namespace. */
+namespace FMS;
 
-if (!defined('SECURED') ) throw new Exception('Attempted security breach', SECURITY_ALERT);
+/* Import the global class Exception into our namespace */
+use Exception;
+
+/* Import the global class DateTime into the FMS namespace */
+use DateTime;
+
+if (!defined('FMS\SECURED') ) throw new Exception('Attempted security breach', SECURITY_ALERT);
 
 require_once(ROOT_PATH.'interfaces/FileSystemInterface.php');
 
@@ -17,10 +25,51 @@ class FileSystem implements FileSystemInterface
   protected $database;
 
   /**
-   * Set the database storage engine we wish to use
+   * The root folder
    *
-   * @param Database $database
+   * We store the root folder here for convenience
+   *
+   * @var Folder $root_folder
    */
+  protected $root_folder;
+
+  /**
+   * Initialise FileSystem
+   */
+  function __construct()
+  {
+    /* Connect to the database storage engine */
+    $this->database = new Database();
+
+    /* Connect to the mysql database */
+    $this->database
+      ->setHostname(DB_HOST)
+      ->setUsername(DB_USERNAME)
+      ->setPassword(DB_PASSWORD)
+      ->setDatabaseName(DB_NAME)
+      ->connect();
+
+    /* Fetch the root folder */
+    try
+    {
+       $this->root_folder = $this->getRootFolder();
+    }
+    catch (Exception $e)
+    {
+      /* Does the root folder exist? */
+      if ( $e->getCode() == MISSING_ROOT_FOLDER )
+      {
+        /* Create the root folder */
+        $this->root_folder = new Folder();
+        $this->root_folder
+          ->setName('root folder')
+          ->setPath('/');
+
+        $this->createRootFolder( $this->root_folder );
+      }
+    }
+  }
+
   public function setDatabase( Database $database )
   {
     $this->database = $database;
@@ -34,24 +83,44 @@ class FileSystem implements FileSystemInterface
    */
   public function createFile(FileInterface $file, FolderInterface $parent)
   {
-    /* Update the file instance */
-    $file
-      ->setParentFolder($parent)
-      ->setCreatedTime(new DateTime());
+    /* TODO: Ensure the filename is unique within this folder. The relational database already enforces uniqueness, but it's better practice to do it here. */
 
-    /* Prepare data for database input */
-    $data = array(
-      'name' => $file->getName(),
-      'size' => $file->getSize(),
-      'created_time' => $file->getCreatedTime()->format('Y-m-d H:i:s'),
-      'parent_folder_id' => $parent->getFolderId()
-    );
 
-    /* Insert the file into the database */
-    $file_id = $this->database->table('files')->insert( $data );
+    try
+    {
+      $this->database->startDbTransaction();
 
-    /* Set the file id */
-    $file->setFileId( $file_id );
+      /* Update the file instance */
+      $file
+        ->setParentFolder($parent)
+        ->setCreatedTime(new DateTime());
+
+      /* Prepare data for database input */
+      $data = array(
+        'name' => $file->getName(),
+        'size' => $file->getSize(),
+        'created_time' => $file->getCreatedTime()->format('Y-m-d H:i:s'),
+        'parent_folder_id' => $parent->getFolderId()
+      );
+
+      /* Insert the file into the database */
+      $file_id = $this->database->table('files')->insert( $data );
+
+      /* Set the file id */
+      $file->setFileId( $file_id );
+
+      /* Import the file into the FMS_UPLOADS folder */
+      if ( !copy( $this->import_file_path, FMS_UPLOADS.$file_id ) )
+        throw new Exception( 'Failed to move file to the FMS_UPLOADS folder.', FILE_IMPORT_ERROR );
+      
+      $this->database->commitDbTransaction();
+    }
+    catch ( Exception $e )
+    {
+      $this->database->rollbackDbTransaction();
+    }
+    
+
 
     return $file;
   }
@@ -91,6 +160,8 @@ class FileSystem implements FileSystemInterface
    */
   public function renameFile(FileInterface $file, $newName)
   {
+    /* TODO: Ensure the filename is unique within this folder. The relational database already enforces uniqueness, but it's better practice to do it here. */
+    
     /* Update the file instance */
     $file
       ->setName( $newName )
@@ -138,15 +209,16 @@ class FileSystem implements FileSystemInterface
    */
   public function createRootFolder(FolderInterface $folder)
   {
+    /* TODO: Limit the system to a single Root folder */
+
     /* Update the folder instance */
     $folder
-      ->setPath('/')
       ->setCreatedTime(new DateTime());
 
     /* Prepare data for database input */
     $data = array(
       'name' => $folder->getName(),
-      'path' => $folder->getPath(),
+      'path' => '/',
       'created_time' => $folder->getCreatedTime()->format('Y-m-d H:i:s')
     );
 
@@ -167,9 +239,11 @@ class FileSystem implements FileSystemInterface
    */
   public function createFolder( FolderInterface $folder, FolderInterface $parent )
   {
+    /* TODO: Ensure the folder name is unique within this folder. The relational database already enforces uniqueness, but it's better practice to do it here. */
+
     /* Update the folder instance */
     $folder
-      ->setPath($parent->getPath().$parent->getName().'/')
+      ->setPath($parent->getPath().$folder->getName().'/')
       ->setCreatedTime(new DateTime());
 
     /* Prepare data for database input */
@@ -215,6 +289,8 @@ class FileSystem implements FileSystemInterface
    */
   public function renameFolder(FolderInterface $folder, $newName)
   {
+    /* TODO: Ensure the folder name is unique within this folder. The relational database already enforces uniqueness, but it's better practice to do it here. */
+
     /* Update the folder instance */
     $folder
       ->setName( $newName );
@@ -326,6 +402,66 @@ class FileSystem implements FileSystemInterface
     }
 
     return $folders;
+  }
+  
+  /**
+   * Get The Root Folder
+   *
+   * "There Can Only Be One"
+   *
+   * @return FolderInterface
+   */
+  public function getRootFolder()
+  {
+    /* Return the $this->root_folder if we have already fetched it */
+    if ( !empty( $this->root_folder ) )
+      return $this->root_folder;
+
+    /* Fetch the root folder */
+    $result = $this->database->table('folders')->selectRootFolder();
+
+    if ( empty( $result ) )
+    {
+      throw new Exception('Missing root folder', MISSING_ROOT_FOLDER);
+    }
+ 
+    /* Instantiate Folder */
+    $folder = new Folder;
+    $folder
+      ->setFolderId($result['folder_id'])
+      ->setName($result['name'])
+      ->setCreatedTime(new DateTime($result['created_time']))
+      ->setPath($result['path']);
+
+    return $folder;
+  }
+
+  /**
+   * Get Parent Folder
+   *
+   * @param FolderInterface $folder
+   *
+   * @return FolderInterface
+   */
+  public function getParentFolder(FolderInterface $folder)
+  {
+    /* Fetch the parent folder */
+    $result = $this->database->table('folders')->selectParentFolder( $folder->getFolderId() );
+
+    if ( empty( $result ) )
+    {
+      throw new Exception('Missing root folder.', INVALID_INPUT);
+    }
+ 
+    /* Instantiate Folder */
+    $folder = new Folder;
+    $folder
+      ->setFolderId($result['folder_id'])
+      ->setName($result['name'])
+      ->setCreatedTime(new DateTime($result['created_time']))
+      ->setPath($result['path']);
+
+    return $folder;
   }
 
   /**

@@ -1,6 +1,11 @@
 <?php
+/* Give the project it's own namespace. */
+namespace FMS;
 
-if (!defined('SECURED') ) throw new Exception('Attempted security breach', SECURITY_ALERT);
+/* Import the global class Exception into our namespace */
+use Exception;
+
+if (!defined('FMS\SECURED') ) throw new Exception('Attempted security breach', SECURITY_ALERT);
 
 /**
  * The validateInput function to handle all input validation
@@ -50,50 +55,56 @@ function validateInput($input,array $field_spec)
     case 'array':
       if(!is_array($input))
       {
-        throw new Exception('Invalid input field: '.var_export($input, true).' '.var_export($field_spec, true), INVALID_INPUT ); 
+        throw new Exception('Invalid input: '.var_export($input, true).'.', INVALID_INPUT ); 
       }
     break;
     case 'numeric':
       if(!is_numeric($input) || (isset($field_spec['maxvalue']) && $input > $field_spec['maxvalue']) || (isset($field_spec['minvalue']) && $input < $field_spec['minvalue']))
       {
-        throw new Exception('Invalid input field: '.var_export($input, true).' '.var_export($field_spec, true), INVALID_INPUT ); 
+        throw new Exception('Invalid input: '.var_export($input, true).'.', INVALID_INPUT ); 
       }
     break;
     case 'integer':
       if( !ctype_digit($input) || (isset($field_spec['maxvalue']) && $input > $field_spec['maxvalue']) || (isset($field_spec['minvalue']) && $input < $field_spec['minvalue']))
       {
-        throw new Exception('Invalid input field: '.var_export($input, true).' '.var_export($field_spec, true), INVALID_INPUT ); 
+        throw new Exception('Invalid input: '.var_export($input, true).'.', INVALID_INPUT ); 
       }
     break;
     case 'date':
       if ( !preg_match( PERL_REGEX_DATETIME_VALIDATION, $input )  )
       {
-        throw new Exception('Invalid input field: '.var_export($input, true).' '.var_export($field_spec, true), INVALID_INPUT ); 
+        throw new Exception('Invalid input: '.var_export($input, true).'.', INVALID_INPUT ); 
+      }
+    break;
+    case 'foldername':
+      /* Limit filenames to alphanumeric characters, '-', '_', and spaces. Limit byte length to 256 bytes. */
+      if ( !preg_match( PERL_REGEX_FOLDERNAME_VALIDATION, $input ) || mb_strlen($input, '8bit') > 256 )
+      {
+        throw new Exception('Invalid input: '.var_export($input, true).'.', INVALID_INPUT ); 
       }
     break;
     case 'filename':
-    case 'foldername':
       /* Limit filenames to alphanumeric characters, '-', '_', and spaces. Limit byte length to 256 bytes. */
       if ( !preg_match( PERL_REGEX_FILENAME_VALIDATION, $input ) || mb_strlen($input, '8bit') > 256 )
       {
-        throw new Exception('Invalid input field: '.var_export($input, true).' '.var_export($field_spec, true), INVALID_INPUT ); 
+        throw new Exception('Invalid input: '.var_export($input, true).'.', INVALID_INPUT ); 
       }
     break;
     case 'path':
       /* Limit path to alphanumeric characters, '-', '_', '/', and spaces. Limit byte length to 8192 bytes. */
       if ( !preg_match( PERL_REGEX_PATH_VALIDATION, $input ) || mb_strlen($input, '8bit') > 8192 )
       {
-        throw new Exception('Invalid input field: '.var_export($input, true).' '.var_export($field_spec, true), INVALID_INPUT ); 
+        throw new Exception('Invalid input: '.var_export($input, true).'.', INVALID_INPUT ); 
       }
     break;
     case 'text':
       if( isset( $field_spec['maxlength'] ) && $field_spec['maxlength'] > 0 && $field_spec['maxlength'] < strlen($input) || isset( $field_spec['minlength'] ) && $field_spec['minlength'] > 0 && $field_spec['minlength'] > strlen($input) )
       {
-        throw new Exception('Invalid input field: '.var_export($input, true).' '.var_export($field_spec, true), INVALID_INPUT ); 
+        throw new Exception('Invalid input: '.var_export($input, true).'.', INVALID_INPUT ); 
       }
     break;
     default:
-      throw new Exception('Unrecognised field spec: '.var_export($input, true).' '.var_export($field_spec, true), INVALID_INPUT ); 
+      throw new Exception('Unrecognised field spec: '.var_export($input, true), INVALID_INPUT ); 
     break;
   }
 

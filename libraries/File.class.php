@@ -1,6 +1,14 @@
 <?php
+/* Give the project it's own namespace. */
+namespace FMS;
 
-if (!defined('SECURED') ) throw new Exception('Attempted security breach', SECURITY_ALERT);
+/* Import the global class DateTime */
+use DateTime;
+
+/* Import the global class Exception into our namespace */
+use Exception;
+
+if (!defined('FMS\SECURED') ) throw new Exception('Attempted security breach', SECURITY_ALERT);
 
 require_once(ROOT_PATH.'interfaces/FileInterface.php');
 
@@ -35,6 +43,11 @@ class File implements FileInterface
    * @var FolderInterface File parent folder
    */
   protected $parent_folder;
+
+  /**
+   * @var string The full path of the file to import into the FMS
+   */
+  protected $import_file_path;
   
   /**
    * Set default property values
@@ -73,6 +86,17 @@ class File implements FileInterface
     return $this;
   }
 
+  /**
+   * @param string $import_file_path Full path to uploaded file 
+   */
+  public function setFileUploadPath( $import_file_path )
+  {
+    if ( !is_file( $import_file_path ) )
+      throw new Exception('Invalid file upload path.', INVALID_INPUT );
+
+    $this->import_file_path = $import_file_path;
+  }
+  
   /**
    * @return string
    */

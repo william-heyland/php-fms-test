@@ -1,6 +1,14 @@
 <?php
+/* Give the project it's own namespace. */
+namespace FMS;
 
-if (!defined('SECURED') ) throw new Exception('Attempted security breach', SECURITY_ALERT);
+/* Import the global class Exception into our namespace */
+use Exception;
+
+/* Import the global class DateTime */
+use DateTime;
+
+if (!defined('FMS\SECURED') ) throw new Exception('Attempted security breach', SECURITY_ALERT);
 
 /**
  * File System Management

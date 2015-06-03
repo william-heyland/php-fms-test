@@ -1,6 +1,11 @@
 <?php
+/* Give the project it's own namespace. */
+namespace FMS;
 
-if (!defined('SECURED') ) throw new Exception('Attempted security breach', SECURITY_ALERT);
+/* Import the global class Exception into our namespace */
+use Exception;
+
+if (!defined('FMS\SECURED') ) throw new Exception('Attempted security breach', SECURITY_ALERT);
 
 require_once(ROOT_PATH.'interfaces/DatabaseTableInterface.php');
 
@@ -127,7 +132,7 @@ class Table implements DatabaseTableInterface {
     /* Put it all together */
     $SQL .= ' SET '.$SQL_SET_CLAUSE.' WHERE '.$SQL_WHERE_CLAUSE.' ';
 
-    /* Run the INSERT query */
+    /* Run the UPDATE query */
     if ( !$this->db_connection->query( $SQL ) )
     {
       throw new Exception('Failed to run database query: '.$SQL, DB_QUERY_ERROR);
@@ -162,7 +167,7 @@ class Table implements DatabaseTableInterface {
     if ( !empty( $SQL_WHERE_CLAUSE ) )
       $SQL .= ' WHERE '.$SQL_WHERE_CLAUSE;
 
-    /* Run the INSERT query */
+    /* Run the SELECT query */
     if ( !$result = $this->db_connection->query( $SQL ) )
     {
       throw new Exception('Failed to run database query: '.$SQL, DB_QUERY_ERROR);
@@ -207,7 +212,7 @@ class Table implements DatabaseTableInterface {
     /* Put it all together */
     $SQL .= ' WHERE '.$SQL_WHERE_CLAUSE;
 
-    /* Run the INSERT query */
+    /* Run the DELETE query */
     if ( !$this->db_connection->query( $SQL ) )
     {
       throw new Exception('Failed to run database query: '.$SQL, DB_QUERY_ERROR);
@@ -224,7 +229,7 @@ class Table implements DatabaseTableInterface {
     /* Construct the SQL query */
     $SQL = 'DELETE FROM '.$this->table_name.' ';
 
-    /* Run the INSERT query */
+    /* Run the DELETE query */
     if ( !$this->db_connection->query( $SQL ) )
     {
       throw new Exception('Failed to run database query: '.$SQL, DB_QUERY_ERROR);

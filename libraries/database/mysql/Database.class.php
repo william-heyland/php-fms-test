@@ -1,6 +1,11 @@
 <?php
+/* Give the project it's own namespace. */
+namespace FMS;
 
-if (!defined('SECURED') ) throw new Exception('Attempted security breach', SECURITY_ALERT);
+/* Import the global class Exception into our namespace */
+use Exception;
+
+if (!defined('FMS\SECURED') ) throw new Exception('Attempted security breach', SECURITY_ALERT);
 
 require_once(ROOT_PATH.'interfaces/DatabaseInterface.php');
 
@@ -154,7 +159,8 @@ class Database implements DatabaseInterface {
     require_once($path);
 
     /* Instantiate the table object */
-    $this->tables[$table_name] = new $table_name();
+    $class_name = '\\FMS\\'.$table_name;
+    $this->tables[$table_name] = new $class_name();
     $this->tables[$table_name]->setDatabaseConnection( $this->db_connection );
 
     /* Return the table object */

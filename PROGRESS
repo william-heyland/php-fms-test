@@ -57,3 +57,33 @@ Progress
 2) I have further tested and verified that all the File, Folder, and FileSystem methods are working as intended
 
 3) I am ready to decide on an inteface?
+
+#########################################
+# Captains Log entry 4, Stardate 20150602
+#########################################
+
+Progress
+========
+1) I have decided on a CLI similar to FTP
+
+2) I have restructured the code base to allow for multiple potential interfaces in the future.
+
+3) The File Management System now resides in it's own namespace 'FMS'.
+
+4) File an Folder names should be unique within their respective parent folders.
+This is already enforced in the relational database, but I also intend to implement this validation within the FileSystem class.
+
+5) I have created the outlines of the CLI interface in the "cli/cli.php" file. To test, run 'php PATH/cli.php'.
+You will get an interactive "FMS>" prompt. Type "help" for a list of supported commands.
+
+#########################################
+# Captains Log entry 5, Stardate 20150603
+#########################################
+
+Progress
+========
+1) I have decided to limit the system to a single Root Folder.
+It was not clear within the interface design if the FMS should support multiple root folders.
+For simplicity I have decided to limit it to a single root folder named '/'.
+The root folder is created, if it does not already exist, as part of the FileSystem initialisation (within the constructor).
+I have made the "createRootFolder()" method private

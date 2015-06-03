@@ -1,0 +1,6 @@
+CLI README
+==========
+
+This "cli" folder contains a command line interface to the File Management System. 
+
+The FMS supports any number of front-ends, each with their own independant configurations and settings.

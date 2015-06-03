@@ -1,6 +1,11 @@
 <?php
+/* Give the project it's own namespace. */
+namespace FMS;
 
-if (!defined('SECURED') ) throw new Exception('Attempted security breach', SECURITY_ALERT);
+/* Import the global class Exception into our namespace */
+use Exception;
+
+if (!defined('FMS\SECURED') ) throw new Exception('Attempted security breach', SECURITY_ALERT);
 
 require_once(ROOT_PATH.'libraries/database/'.DB_ENGINE.'/Table.class.php');
 
@@ -9,8 +14,19 @@ require_once(ROOT_PATH.'libraries/database/'.DB_ENGINE.'/Table.class.php');
  *
  */
 class files extends Table {
+
+  /**
+   * Table name
+   *
+   * @var string The database table name
+   */
   protected $table_name = 'files';
-  
+
+  /**
+   * Table columns
+   *
+   * @var array The database table columns
+   */
   protected $table_columns = array(
     'file_id',
     'name',
