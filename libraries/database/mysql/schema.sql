@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS `files` (
   PRIMARY KEY (`file_id`),
   KEY `files_index2` (`parent_folder_id`),
   KEY `files_index1` (`name`(255))
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=197 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `folders` (
   `parent_folder_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`folder_id`),
   KEY `folders_index1` (`parent_folder_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=231 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 
 --
 -- Constraints for dumped tables

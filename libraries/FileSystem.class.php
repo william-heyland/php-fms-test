@@ -370,8 +370,11 @@ class FileSystem implements FileSystemInterface
 
     try
     {
+      /* Get parent folder */
+      $parent = $this->getParentFolder( $folder );
+
       /* Check if a folder with this name already exists */
-      if ( $this->getFolderByPath($folder->getPath().$newName.'/' ) )
+      if ( $this->getFolderByPath($parent->getPath().$newName.'/' ) )
         throw new Exception( 'Folder already exists.', FILE_IMPORT_ERROR );
 
       /* Update the folder instance */
