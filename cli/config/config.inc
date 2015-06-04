@@ -39,7 +39,7 @@ $command_map = array(
 'rename' => 'fmsCliRenameFile',
 'renamedir' => 'fmsCliRenameFolder',
 'rmdir' => 'fmsCliRmdir',
-'size' => 'fmsCliSize'
+'size' => 'fmsCliFileSize'
 );
 
 /* Some useful Linux console escape sequences used in help hereDoc below */
@@ -121,8 +121,8 @@ ${bold}DESCRIPTION${normal}
           ${bold}rmdir${normal} "FMS directory name"
                   Delete a FMS directory.
 
-          ${bold}size${normal} "FMS filename" | "FMS directory"
-                  Give size of FMS file or directory
+          ${bold}size${normal} "FMS filename"
+                  Give size of a FMS file
 EOH;
 
 /**

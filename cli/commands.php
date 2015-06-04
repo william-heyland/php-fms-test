@@ -458,12 +458,38 @@ function fmsCliRmdir( $parameters = array() )
 }
 
 /**
- * Give size of FMS file or folder
+ * Give size of FMS file
  *
  * @param Array $parameters
  */
-function fmsCliSize()
+function fmsCliFileSize( $parameters )
 {
+  global $filesystem;
+  global $fmswd;
+  
+  /* Check that the user has supplied a file name */
+  if ( !isset( $parameters[1] ) )
+    throw new Exception('Missing command parameter "FMS file name".', CLI_MISSING_INPUT);
+
+  /* Obtain a list of files within the current FMS working directory */
+  $files = $filesystem->getFiles( $fmswd );
+
+  /* Identify which file we are attempting to size */
+  $file_to_size = NULL;
+  foreach( $files as $file )
+  {
+    if ( $file->getName() == $parameters[1] )
+    {
+      $file_to_size = $file;
+      break;
+    }
+  }
+
+  if ( empty( $file_to_size ) )
+    throw new Exception( 'Unknown FMS file.', CLI_INVALID_INPUT );
+
+  displayOutput( getConsoleEscapeSequence('bold').$file_to_size->getSize().' Bytes'.getConsoleEscapeSequence('normal') );
+    
   return true;
 }
 
