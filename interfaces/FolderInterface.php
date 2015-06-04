@@ -48,3 +48,4 @@ interface FolderInterface
    */
   public function setPath($path);
 }
+?>

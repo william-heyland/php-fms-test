@@ -4,7 +4,7 @@
  *
  * This CLI is modelled on the interactive FTP interface
  * Supported interactive commands include:
- * 'bye', 'cd', 'delete', 'dir', 'exit', 'get', 'help', 'lcd', 'lpwd', 'ls', 'mkdir', 'moo', 'put', 'pwd', 'quit', 'rename', 'rmdir', 'size'
+ * 'bye', 'cd', 'delete', 'dir', 'exit', 'get', 'help', 'lcd', 'ldir', 'lpwd', 'ls', 'mkdir', 'moo', 'put', 'pwd', 'quit', 'rename', 'renamedir', 'rmdir', 'size'
  */
 
 /**
@@ -15,6 +15,9 @@
  * if (!defined('SECURED') ) throw new Exception('Possible attempted security breach', SECURITY_ALERT);
  */
 define( 'SECURED', true );
+
+/* Toggle error reporting */
+error_reporting(0);
 
 /* Include the cli configuration */
 require_once('/home/jdi/php-fms-test/cli/config/config.inc');
@@ -59,6 +62,7 @@ $filesystem = new \FMS\FileSystem();
 $fmswd = $filesystem->getRootFolder();
 
 /* Launch interactive mode */
+displayWelcomeMessage();
 waitForInput();
 
 /**
@@ -77,6 +81,7 @@ function waitForInput()
   }
   catch (Exception $e)
   {
+    /* This is our TOP level exception handler */
     displayExceptionErrorMessage( $e );
     waitForInput();
   }
@@ -107,7 +112,7 @@ function processInput($input)
 
 function displayExceptionErrorMessage( $e )
 {
-  $error_message = $e->getMessage().' Type "help" for a full command synopsis.';
+  $error_message = getConsoleEscapeSequence('red').$e->getMessage().getConsoleEscapeSequence('normal').' Type "help" for a full command synopsis.';
   
   displayOutput( $error_message );
 }
@@ -119,7 +124,21 @@ function displayPrompt()
 {
   global $fmswd;
 
-  fputs(STDOUT, 'FMS:'.$fmswd->getPath().'> ');
+  $prompt = 'FMS:'.getConsoleEscapeSequence('blue').$fmswd->getPath().getConsoleEscapeSequence('red').'> '.getConsoleEscapeSequence('normal');
+
+  fputs(STDOUT, $prompt);
+}
+
+/**
+ * Display welcome message
+ */
+function displayWelcomeMessage()
+{
+  global $welcome_message;
+  
+  $welcome_message = getConsoleEscapeSequence('yellow').$welcome_message.getConsoleEscapeSequence('normal');
+  
+  displayOutput( $welcome_message );
 }
 
 /**
@@ -129,7 +148,30 @@ function displayPrompt()
  */
 function displayOutput( $string )
 {
-  fputs(STDOUT, PHP_EOL.PHP_EOL.$string.PHP_EOL.PHP_EOL);
+  fputs(STDOUT, PHP_EOL.$string.PHP_EOL.PHP_EOL);
 }
 
-?> 
+/**
+ * Get console escape sequence (Linux only I'm afraid!)
+ */
+function getConsoleEscapeSequence( $sequence_name )
+{
+  if ( PHP_OS != 'Linux' )
+    return '';
+
+  $escape_sequences = array( 
+    'normal'     => "[0m", 
+    'red'         => "[1;31m", 
+    'green'     => "[1;32m", 
+    'yellow'     => "[0;33m", 
+    'blue'         => "[1;34m", 
+    'bold'         => "[1m", 
+    'underscore'     => "[4m", 
+  );
+
+  if ( array_key_exists( $sequence_name, $escape_sequences ) )
+    return chr(27).$escape_sequences[$sequence_name];
+    
+  return '';
+}
+?>

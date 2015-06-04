@@ -29,7 +29,7 @@ function fmsCliCd( $parameters = array() )
 
   /* Check that the user has supplied a folder name */
   if ( !isset( $parameters[1] ) )
-    throw new Exception('Missing command parameter "folder name".', CLI_MISSING_INPUT);
+    throw new Exception('Missing command parameter "FMS directory name".', CLI_MISSING_INPUT);
 
   /* Check for special path '/' */
   if ( $parameters[1] == '/' )
@@ -116,23 +116,27 @@ function fmsCliDir( $parameters = array() )
   $folders = $filesystem->getFolders( $fmswd );
 
   $folder_names = '';
-  
+
   foreach( $folders as $folder )
   {
-    $folder_names .= $folder->getName().PHP_EOL;
+    $folder_names .= getConsoleEscapeSequence('blue').$folder->getName().getConsoleEscapeSequence('normal').PHP_EOL;
   }
+  
+  $folder_names = getConsoleEscapeSequence('bold').'FMS Folders ('.count($folders).'): '.getConsoleEscapeSequence('normal').PHP_EOL.$folder_names.PHP_EOL;
 
   /* Optain is list of files within the current FMS working directory */
   $files = $filesystem->getFiles( $fmswd );
   
   $file_names = '';
-  
+
   foreach( $files as $file )
   {
-    $file_names .= $file->getName().PHP_EOL;
+    $file_names .= getConsoleEscapeSequence('green').$file->getName().getConsoleEscapeSequence('normal').PHP_EOL;
   }
+  
+  $file_names = getConsoleEscapeSequence('bold').'FMS Files ('.count($files).'):'.getConsoleEscapeSequence('normal').PHP_EOL.$file_names;
 
-  displayOutput( 'Folders: '.PHP_EOL.'========'.PHP_EOL.$folder_names.PHP_EOL.'Files:'.PHP_EOL.'======'.PHP_EOL.$file_names );
+  displayOutput( $folder_names.$file_names );
 
   return true;
 }
@@ -144,6 +148,39 @@ function fmsCliDir( $parameters = array() )
  */
 function fmsCliGet( $parameters = array() )
 {
+  global $filesystem;
+  global $fmswd;
+
+  /* Check that the user has supplied a FMS filename */
+  if ( !isset( $parameters[1] ) )
+    throw new Exception('Missing command parameter "FMS filename".', CLI_MISSING_INPUT);
+
+  /* Obtain a list of files within the current FMS working directory */
+  $files = $filesystem->getFiles( $fmswd );
+
+  /* Identify which file we are attempting to get */
+  $file_to_get = NULL;
+  foreach( $files as $file )
+  {
+    if ( $file->getName() == $parameters[1] )
+    {
+      $file_to_get = $file;
+      break;
+    }
+  }
+
+  /* Did we find a matching file? */
+  if ( empty( $file_to_get ) )
+    throw new Exception( 'Unknown FMS file.', CLI_INVALID_INPUT );
+
+  /* Check that the LOCAL filename is valid and does not already exist */
+  if ( file_exists( getcwd().'/'.$parameters[1] ) )
+    throw new Exception('A file with this filename already exists in the LOCAL working directory "'.getcwd().'/'.$parameters[1].'".', CLI_INVALID_INPUT);
+
+  /* Copy the FMS file to the LOCAL filesystem */
+  if ( !copy( FMS\UPLOADS_PATH.$file_to_get->getFileId(), getcwd().'/'.$parameters[1] ) )
+    throw new Exception( 'Failed to move file to the current LOCAL working directory.', FILE_IMPORT_ERROR );
+    
   return true;
 }
 
@@ -175,33 +212,35 @@ function fmsCliLcd( $parameters = array() )
 }
 
 /**
- * 
+ * List contents of current LOCAL working directory.
  *
  * @param Array $parameters
  */
 function fmsCliLdir( $parameters = array() )
 {
   /* Use file globbing to retrieve LOCAL directories */
-  if ( ! $folders = $dirs = array_filter(glob('*'), 'is_dir') )
-    throw new Exception( 'Unknown LOCAL directory.', CLI_INVALID_INPUT );
+  $folders = array_filter(glob('*'), 'is_dir');
 
   $folder_names = '';
   foreach( $folders as $folder )
   {
-    $folder_names .= $folder.PHP_EOL;
+    $folder_names .= getConsoleEscapeSequence('blue').$folder.getConsoleEscapeSequence('normal').PHP_EOL;
   }
   
+  $folder_names = getConsoleEscapeSequence('bold').'LOCAL Folders ('.count($folders).'): '.getConsoleEscapeSequence('normal').PHP_EOL.$folder_names.PHP_EOL;
+
   /* Use file globbing to retrieve LOCAL files */
-  if ( ! $files = $dirs = array_filter(glob('*'), 'is_file') )
-    throw new Exception( 'Unknown LOCAL directory.', CLI_INVALID_INPUT );
+  $files = array_filter(glob('*'), 'is_file');
 
   $file_names = '';
   foreach( $files as $file )
   {
-    $file_names .= $file.PHP_EOL;
+    $file_names .= getConsoleEscapeSequence('green').$file.getConsoleEscapeSequence('normal').PHP_EOL;
   }
+  
+  $file_names = getConsoleEscapeSequence('bold').'LOCAL Files ('.count($files).'):'.getConsoleEscapeSequence('normal').PHP_EOL.$file_names;
 
-  displayOutput( 'Folders: '.PHP_EOL.'========'.PHP_EOL.$folder_names.PHP_EOL.'Files:'.PHP_EOL.'======'.PHP_EOL.$file_names );
+  displayOutput( $folder_names.$file_names );
 
   return true;
 }
@@ -213,7 +252,7 @@ function fmsCliLdir( $parameters = array() )
  */
 function fmsCliLpwd( $parameters = array() )
 {
-  displayOutput( getcwd() );
+  displayOutput( getConsoleEscapeSequence('bold').getcwd().getConsoleEscapeSequence('normal') );
 
   return true;
 }
@@ -230,7 +269,7 @@ function fmlsCliMkdir( $parameters = array() )
 
   /* Check that the user has supplied a folder name */
   if ( !isset( $parameters[1] ) )
-    throw new Exception('Missing command parameter "folder name".', CLI_MISSING_INPUT);
+    throw new Exception('Missing command parameter "FMS directory name".', CLI_MISSING_INPUT);
 
   /* Create a instance of a new folder */
   $folder = new \FMS\Folder();
@@ -252,7 +291,7 @@ function fmsCliMoo( $parameters = array() )
 {
   global $cow;
 
-  displayOutput( $cow );
+  displayOutput( getConsoleEscapeSequence('bold').$cow.getConsoleEscapeSequence('normal') );
 
   return true;
 }
@@ -269,7 +308,7 @@ function fmsCliPut( $parameters = array() )
 
   /* Check that the user has supplied a LOCAL filename */
   if ( !isset( $parameters[1] ) )
-    throw new Exception('Missing command parameter "LOCAL file name".', CLI_MISSING_INPUT);
+    throw new Exception('Missing command parameter "LOCAL filename".', CLI_MISSING_INPUT);
 
   /* Check that the local file exists */
   if ( !is_file( getcwd().'/'.$parameters[1] ) )
@@ -279,7 +318,9 @@ function fmsCliPut( $parameters = array() )
   $file = new FMS\File();
 
   /* Set the file Name */
-  $file->setName( $parameters[1] );
+  $file
+    ->setImportFilePath( getcwd().'/'.$parameters[1] )
+    ->setName( $parameters[1] );
 
   /* Add the file to the FMS */
   $filesystem->createFile( $file, $fmswd );
@@ -296,7 +337,7 @@ function fmsCliPwd( $parameters = array() )
 {
   global $fmswd;
 
-  displayOutput( $fmswd->getPath() );
+  displayOutput( getConsoleEscapeSequence('bold').$fmswd->getPath().getConsoleEscapeSequence('normal') );
 
   return true;
 }
@@ -306,7 +347,7 @@ function fmsCliPwd( $parameters = array() )
  *
  * @param Array $parameters
  */
-function fmsCliRename( $parameters = array() )
+function fmsCliRenameFile( $parameters = array() )
 {
   global $filesystem;
   global $fmswd;
@@ -317,7 +358,7 @@ function fmsCliRename( $parameters = array() )
 
   /* Check that the user has supplied a new FMS filename */
   if ( !isset( $parameters[2] ) )
-    throw new Exception('Missing command parameter "new filename".', CLI_MISSING_INPUT);
+    throw new Exception('Missing command parameter "New filename".', CLI_MISSING_INPUT);
 
   /* Obtain a list of files within the current FMS working directory */
   $files = $filesystem->getFiles( $fmswd );
@@ -343,6 +384,47 @@ function fmsCliRename( $parameters = array() )
 }
 
 /**
+ * Rename an FMS folder.
+ *
+ * @param Array $parameters
+ */
+function fmsCliRenameFolder( $parameters = array() )
+{
+  global $filesystem;
+  global $fmswd;
+
+  /* Check that the user has supplied a FMS filename */
+  if ( !isset( $parameters[1] ) )
+    throw new Exception('Missing command parameter "FMS directory name".', CLI_MISSING_INPUT);
+
+  /* Check that the user has supplied a new FMS filename */
+  if ( !isset( $parameters[2] ) )
+    throw new Exception('Missing command parameter "New directory name".', CLI_MISSING_INPUT);
+
+  /* Obtain a list of folders within the current FMS working directory */
+  $folders = $filesystem->getFolders( $fmswd );
+
+  /* Identify which folder we are attempting to rename */
+  $folder_to_rename = NULL;
+  foreach( $folders as $folder )
+  {
+    if ( $folder->getName() == $parameters[1] )
+    {
+      $folder_to_rename = $folder;
+      break;
+    }
+  }
+
+  if ( empty( $folder_to_rename ) )
+    throw new Exception( 'Unknown FMS file.', CLI_INVALID_INPUT );
+
+  /* Rename the file */
+  $filesystem->renameFolder( $folder_to_rename, $parameters[2] );
+
+  return true;
+}
+
+/**
  * Delete a FMS folder.
  *
  * @param Array $parameters
@@ -354,7 +436,7 @@ function fmsCliRmdir( $parameters = array() )
   
   /* Check that the user has supplied a folder name */
   if ( !isset( $parameters[1] ) )
-    throw new Exception('Missing command parameter "folder name".', CLI_MISSING_INPUT);
+    throw new Exception('Missing command parameter "FMS directory name".', CLI_MISSING_INPUT);
 
   /* Optain is list of folders within the current working directory */
   $folders = $filesystem->getFolders( $fmswd );
@@ -364,10 +446,13 @@ function fmsCliRmdir( $parameters = array() )
   foreach( $folders as $folder )
   {
     if ( $folder->getName() == $parameters[1] )
+    {
       $folder_to_delete = $folder;
+      break;
+    }
   }
   
-  $filesystem->deleteFolder( $folder );
+  $filesystem->deleteFolder( $folder_to_delete );
 
   return true;
 }

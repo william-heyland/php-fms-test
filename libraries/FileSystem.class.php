@@ -83,16 +83,21 @@ class FileSystem implements FileSystemInterface
    */
   public function createFile(FileInterface $file, FolderInterface $parent)
   {
-    /* TODO: Ensure the filename is unique within this folder. The relational database already enforces uniqueness, but it's better practice to do it here. */
+    /* Use a database transaction to ensure the filename is unique within this folder.*/
 
+    /* Start a new database transaction */
+    $this->database->startDbTransaction();
 
     try
     {
-      $this->database->startDbTransaction();
+      /* Check if a file with this path already exists */
+      if ( $this->getFileByPath( $parent->getPath(), $file->getName() ) )
+        throw new Exception( 'File already exists.', FILE_IMPORT_ERROR );
 
       /* Update the file instance */
       $file
         ->setParentFolder($parent)
+        ->setSize( filesize( $file->getImportFilePath() ) )
         ->setCreatedTime(new DateTime());
 
       /* Prepare data for database input */
@@ -109,18 +114,22 @@ class FileSystem implements FileSystemInterface
       /* Set the file id */
       $file->setFileId( $file_id );
 
-      /* Import the file into the FMS_UPLOADS folder */
-      if ( !copy( $this->import_file_path, FMS_UPLOADS.$file_id ) )
-        throw new Exception( 'Failed to move file to the FMS_UPLOADS folder.', FILE_IMPORT_ERROR );
-      
-      $this->database->commitDbTransaction();
+      /* Import the file into the UPLOADS_PATH folder */
+      if ( !copy( $file->getImportFilePath(), UPLOADS_PATH.$file_id ) )
+        throw new Exception( 'Failed to move file to the UPLOADS_PATH folder.', FILE_IMPORT_ERROR );
+
     }
     catch ( Exception $e )
     {
+      /* Rollback the DB transaction */
       $this->database->rollbackDbTransaction();
-    }
-    
 
+      /* We still want to throw the exception up the food chain */
+      throw $e;
+    }
+
+    /* Commit this database transaction */
+    $this->database->commitDbTransaction();
 
     return $file;
   }
@@ -132,22 +141,47 @@ class FileSystem implements FileSystemInterface
    */
   public function updateFile(FileInterface $file)
   {
-    /* Update the file instance */
-    $file->setModifiedTime(new DateTime());
+    /* Use a database transaction to ensure the filename is unique within this folder.*/
 
-    /* Prepare data for database input */
-    $data = array(
-      'size' => $file->getSize(),
-      'parent_folder_id' => $file->getParentFolder()->getFolderId(),
-      'modified_time' => $file->getModifiedTime()->format('Y-m-d H:i:s')
-    );
-    /* Prepare where clause data */
-    $where = array(
-       'file_id' => $file->getFileId()
-    );
+    /* Start a new database transaction */
+    $this->database->startDbTransaction();
 
-    /* Update the file in the database */
-    $this->database->table('files')->update( $data, $where );
+    try
+    {
+      /* Update the file instance */
+      $file
+        ->setSize( filesize( $file->getImportFilePath() ) )
+        ->setModifiedTime(new DateTime());
+
+      /* Prepare data for database input */
+      $data = array(
+        'size' => $file->getSize(),
+        'parent_folder_id' => $file->getParentFolder()->getFolderId(),
+        'modified_time' => $file->getModifiedTime()->format('Y-m-d H:i:s')
+      );
+      /* Prepare where clause data */
+      $where = array(
+         'file_id' => $file->getFileId()
+      );
+
+      /* Update the file in the database */
+      $this->database->table('files')->update( $data, $where );
+
+      /* Import the file into the UPLOADS_PATH folder */
+      if ( !copy( $file->getImportFilePath(), UPLOADS_PATH.$file_id ) )
+        throw new Exception( 'Failed to move file to the UPLOADS_PATH folder.', FILE_IMPORT_ERROR );
+    }
+    catch ( Exception $e )
+    {
+      /* Rollback the DB transaction */
+      $this->database->rollbackDbTransaction();
+
+      /* We still want to throw the exception up the food chain */
+      throw $e;
+    }
+    
+    /* Commit this database transaction */
+    $this->database->commitDbTransaction();
 
     return $file;
   }
@@ -160,28 +194,50 @@ class FileSystem implements FileSystemInterface
    */
   public function renameFile(FileInterface $file, $newName)
   {
-    /* TODO: Ensure the filename is unique within this folder. The relational database already enforces uniqueness, but it's better practice to do it here. */
-    
-    /* Update the file instance */
-    $file
-      ->setName( $newName )
-      ->setModifiedTime(new DateTime());
+    /* Use a database transaction to ensure the filename is unique within this folder. */
 
-    /* Prepare data for database input */
-    $data = array(
-      'name' => $file->getName(),
-      'modified_time' => $file->getModifiedTime()->format('Y-m-d H:i:s')
-    );
+    /* Start a new database transaction */
+    $this->database->startDbTransaction();
 
-    /* Prepare where clause data */
-    $where = array(
-      'file_id' => $file->getFileId()
-    );
+    try
+    {
+      /* Check if a file with this path already exists */
+      if ( $this->getFileByPath( $file->getParentFolder()->getPath(), $newName ) )
+        throw new Exception( 'File already exists.', FILE_IMPORT_ERROR );
 
-    /* Update the file in the database */
-    $this->database->table('files')->update( $data, $where );
+      /* Update the file instance */
+      $file
+        ->setName( $newName )
+        ->setModifiedTime(new DateTime());
 
-    return true;
+      /* Prepare data for database input */
+      $data = array(
+        'name' => $file->getName(),
+        'modified_time' => $file->getModifiedTime()->format('Y-m-d H:i:s')
+      );
+
+      /* Prepare where clause data */
+      $where = array(
+        'file_id' => $file->getFileId()
+      );
+
+      /* Update the file in the database */
+      $this->database->table('files')->update( $data, $where );
+
+    }
+    catch ( Exception $e )
+    {
+      /* Rollback the DB transaction */
+      $this->database->rollbackDbTransaction();
+
+      /* We still want to throw the exception up the food chain */
+      throw $e;
+    }
+
+    /* Commit this database transaction */
+    $this->database->commitDbTransaction();
+
+    return $file;
   }
 
   /**
@@ -209,8 +265,6 @@ class FileSystem implements FileSystemInterface
    */
   public function createRootFolder(FolderInterface $folder)
   {
-    /* TODO: Limit the system to a single Root folder */
-
     /* Update the folder instance */
     $folder
       ->setCreatedTime(new DateTime());
@@ -239,26 +293,48 @@ class FileSystem implements FileSystemInterface
    */
   public function createFolder( FolderInterface $folder, FolderInterface $parent )
   {
-    /* TODO: Ensure the folder name is unique within this folder. The relational database already enforces uniqueness, but it's better practice to do it here. */
+    /* Use a database transaction to ensure the folder is unique. */
 
-    /* Update the folder instance */
-    $folder
-      ->setPath($parent->getPath().$folder->getName().'/')
-      ->setCreatedTime(new DateTime());
+    /* Start a new database transaction */
+    $this->database->startDbTransaction();
 
-    /* Prepare data for database input */
-    $data = array(
-      'name' => $folder->getName(),
-      'path' => $folder->getPath(),
-      'parent_folder_id' => $parent->getFolderId(),
-      'created_time' => $folder->getCreatedTime()->format('Y-m-d H:i:s')
-    );
+    try
+    {
+      /* Check if a folder with this path already exists */
+      if ( $this->getFolderByPath($parent->getPath().$folder->getName().'/' ) )
+        throw new Exception( 'Folder already exists.', FILE_IMPORT_ERROR );
 
-    /* Insert the folder into the database */
-    $folder_id = $this->database->table('folders')->insert( $data );
+      /* Update the folder instance */
+      $folder
+        ->setPath($parent->getPath().$folder->getName().'/')
+        ->setCreatedTime(new DateTime());
 
-    /* Set the folder id */
-    $folder->setFolderId( $folder_id );
+      /* Prepare data for database input */
+      $data = array(
+        'name' => $folder->getName(),
+        'path' => $folder->getPath(),
+        'parent_folder_id' => $parent->getFolderId(),
+        'created_time' => $folder->getCreatedTime()->format('Y-m-d H:i:s')
+      );
+
+      /* Insert the folder into the database */
+      $folder_id = $this->database->table('folders')->insert( $data );
+
+      /* Set the folder id */
+      $folder->setFolderId( $folder_id );
+
+    }
+    catch ( Exception $e )
+    {
+      /* Rollback the DB transaction */
+      $this->database->rollbackDbTransaction();
+
+      /* We still want to throw the exception up the food chain */
+      throw $e;
+    }
+
+    /* Commit this database transaction */
+    $this->database->commitDbTransaction();
 
     return $folder;
   }
@@ -289,24 +365,36 @@ class FileSystem implements FileSystemInterface
    */
   public function renameFolder(FolderInterface $folder, $newName)
   {
-    /* TODO: Ensure the folder name is unique within this folder. The relational database already enforces uniqueness, but it's better practice to do it here. */
+    /* Use a database transaction to ensure the folder is unique. */
 
-    /* Update the folder instance */
-    $folder
-      ->setName( $newName );
+    /* Start a new database transaction */
+    $this->database->startDbTransaction();
 
-    /* Prepare data for database input */
-    $data = array(
-      'name' => $folder->getName()
-    );
+    try
+    {
+      /* Check if a folder with this name already exists */
+      if ( $this->getFolderByPath($folder->getPath().$newName.'/' ) )
+        throw new Exception( 'Folder already exists.', FILE_IMPORT_ERROR );
 
-    /* Prepare where clause data */
-    $where = array(
-      'folder_id' => $folder->getFolderId()
-    );
+      /* Update the folder instance */
+      $folder
+        ->setName( $newName );
 
-    /* Update the folder name and modified time in the database */
-    $this->database->table('folders')->update( $data, $where );
+      /* Update the folder name */
+      $this->database->table('folders')->updateFolderName( $folder->getFolderId(), $newName );
+
+    }
+    catch ( Exception $e )
+    {
+      /* Rollback the DB transaction */
+      $this->database->rollbackDbTransaction();
+
+      /* We still want to throw the exception up the food chain */
+      throw $e;
+    }
+
+    /* Commit this database transaction */
+    $this->database->commitDbTransaction();
 
     return true;
   }
@@ -499,4 +587,81 @@ class FileSystem implements FileSystemInterface
 
     return $files;
   }
+  
+  /**
+   * @param string   $path The path is the full path of the folder including a '/'
+   * @param string   $filename
+   *
+   * @return FileInterface|bool Returns a FileInterface object or false if file does not exist
+   */
+  protected function getFileByPath( $path, $filename )
+  {
+    /* Validate $filename */
+    $field_spec = array(
+      'required' => 'true',
+      'type' => 'filename'
+    );
+    validateInput( $filename, $field_spec );
+
+    /* Validate $path */
+    $field_spec = array(
+      'required' => 'true',
+      'type' => 'path'
+    );
+    validateInput( $path, $field_spec );
+
+    /* Fetch the file */
+    $result = $this->database->table('files')->selectByPath( $path, $filename );
+
+    /* If file does not exist, return false. */
+    if ( empty( $result ) )
+      return false;
+
+    /* Instantiate a new file */
+    $file = new File;
+    $file
+      ->setFileId($result['file_id'])
+      ->setName($result['name'])
+      ->setSize($result['size'])
+      ->setCreatedTime(new DateTime($result['created_time']));
+
+    if ( !empty( $result['modified_time'] ) )
+      $file->setModifiedTime(new DateTime($result['modified_time']));
+
+    return $file;
+  }
+
+  /**
+   * @param string   $path The path is the full path of the folder including a '/'
+   *
+   * @return FileInterface|bool Returns a FolderInterface object or false if folder does not exist
+   */
+  protected function getFolderByPath($path)
+  {
+
+    /* Validate $path */
+    $field_spec = array(
+      'required' => 'true',
+      'type' => 'path'
+    );
+    validateInput( $path, $field_spec );
+
+    /* Fetch the folder */
+    $result = $this->database->table('folders')->selectByPath( $path );
+
+    /* If folder does not exist, return false. */
+    if ( empty( $result ) )
+      return false;
+
+    /* Instantiate Folder */
+    $folder = new Folder;
+    $folder
+      ->setFolderId($result['folder_id'])
+      ->setName($result['name'])
+      ->setCreatedTime(new DateTime($result['created_time']))
+      ->setPath($result['path']);
+
+    return $folder;
+  }
 }
+?>

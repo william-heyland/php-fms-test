@@ -36,6 +36,31 @@ class files extends Table {
     'path',
     'parent_folder_id'
   );
+  
+  /**
+   * Select By Path
+   *
+   * @param string $path
+   * @param string $filename
+   *
+   * @return array
+   */
+  public function selectByPath( $path, $filename )
+  {
+    /* Construct the SQL query. */
+    $SQL = "SELECT * FROM files JOIN folders ON files.name = '".$this->db_connection->real_escape_string( $filename )."' AND files.parent_folder_id = folders.folder_id AND folders.path = '".$this->db_connection->real_escape_string( $path )."' ";
+
+    /* Run the query */
+    if ( !$result = $this->db_connection->query( $SQL ) )
+    {
+      throw new Exception('Failed to run database query: '.$SQL, DB_QUERY_ERROR);
+    }
+
+    /* Fetch the result as an associative array */
+    $row = $result->fetch_assoc();
+
+    return $row;
+  }
 }
 
-?> 
+?>

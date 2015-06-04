@@ -44,7 +44,7 @@ function validateInput($input,array $field_spec)
     /* Is this a required field? */
     if( $field_spec['required'] == 'true' && empty($input) && $input !== 0 && $input !== '0' )
     {
-      throw new Exception('Missing input field: '.var_export($field_spec, true), INVALID_INPUT ); 
+      throw new Exception('Missing input field: '.var_export($field_spec, true).'.', INVALID_INPUT ); 
     }
 
     return NULL;

@@ -33,7 +33,7 @@ class Folder implements FolderInterface
    * @var string Folder path
    */
   protected $path;
-  
+
   /**
    * Set default property values
    */
@@ -147,3 +147,4 @@ class Folder implements FolderInterface
     return $this;
   }
 }
+?>

@@ -87,14 +87,24 @@ class File implements FileInterface
   }
 
   /**
+   * @return string The full path to the file to import
+   */
+  public function getImportFilePath()
+  {
+    return $this->import_file_path;
+  }
+  
+  /**
    * @param string $import_file_path Full path to uploaded file 
    */
-  public function setFileUploadPath( $import_file_path )
+  public function setImportFilePath( $import_file_path )
   {
     if ( !is_file( $import_file_path ) )
       throw new Exception('Invalid file upload path.', INVALID_INPUT );
 
     $this->import_file_path = $import_file_path;
+    
+    return $this;
   }
   
   /**
@@ -221,3 +231,4 @@ class File implements FileInterface
     return $this->parent_folder->getPath().$this->parent_folder->getName().'/';
   }
 }
+?>

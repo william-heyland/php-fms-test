@@ -86,4 +86,17 @@ Progress
 It was not clear within the interface design if the FMS should support multiple root folders.
 For simplicity I have decided to limit it to a single root folder named '/'.
 The root folder is created, if it does not already exist, as part of the FileSystem initialisation (within the constructor).
-I have made the "createRootFolder()" method private
+
+#########################################
+# Captains Log entry 6, Stardate 20150604
+#########################################
+
+Progress
+========
+1) I have finished the Command Line Interface and am in full testing mode.
+
+Outstanding items
+=================
+1) Removing a file or folder does not currently "clean up" the files in the upload folder (UPLOADS_PATH).
+
+

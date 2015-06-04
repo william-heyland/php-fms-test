@@ -48,12 +48,12 @@ define( 'FMS\DB_HOST', 'localhost' );
 define( 'FMS\DB_ENGINE', 'mysql' );
 
 /**
- * FILE_STORAGE
+ * UPLOADS_PATH
  *
  * The location on disk of files uploaded to the FMS.
- * It's generally a bad idea to store and serve files directly from a database so the actual FMS files will be stored on disk
+ * It's generally a bad idea to store and serve files directly from a database so the actual FMS files will be stored in the UPLOADS_PATH folder
  */
-define( 'FMS\UPLOADS', ROOT_PATH.'fms_uploads' );
+define( 'FMS\UPLOADS_PATH', ROOT_PATH.'fms_uploads/' );
 
 /**
  * Common error codes used in my exception handling
@@ -65,6 +65,7 @@ define( 'FMS\DB_CONNECT_ERROR', 100 );
 define( 'FMS\DB_UNKNOWN_TABLE_ERROR', 101 );
 define( 'FMS\DB_QUERY_ERROR', 102 );
 define( 'FMS\SECURITY_ALERT', 200 );
+define( 'FMS\FILE_IMPORT_ERROR', 300 );
 
 /**
  * Perl regular expression input validation

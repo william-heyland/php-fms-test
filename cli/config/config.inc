@@ -36,83 +36,103 @@ $command_map = array(
 'put' => 'fmsCliPut',
 'pwd' => 'fmsCliPwd',
 'quit' => 'fmsCliExit',
-'rename' => 'fmsCliRename',
+'rename' => 'fmsCliRenameFile',
+'renamedir' => 'fmsCliRenameFolder',
 'rmdir' => 'fmsCliRmdir',
 'size' => 'fmsCliSize'
 );
+
+/* Some useful Linux console escape sequences used in help hereDoc below */
+$bold = getConsoleEscapeSequence('bold');
+$normal = getConsoleEscapeSequence('normal');
 
 /**
  * @var string $help A full cli command synopsis
  */
 $help = <<<EOH
-NAME
+${bold}NAME${normal}
       FMS — File Management System (CLI)
      
-SYNOPSIS
+${bold}SYNOPSIS${normal}
       php cli.php -h --help
 
-DESCRIPTION
+${bold}DESCRIPTION${normal}
       cli.php is a command line interface to a database driven, File Management System. The program runs in interactive mode.
 
       Recognised command line options:
-      
-          -h
-          --help
+
+          ${bold}-h${normal}
+          ${bold}--help${normal}
                   Display this help screen
       
       In interactive mode, cli.php supports a subset of commands found in FTP including:
-      
-          bye
+
+          ${bold}bye${normal}
                   Terminate the FMS session.
-          
-          cd "FMS directory"
+
+          ${bold}cd${normal} "FMS directory name"
                   Change the FMS working directory.
-          
-          delete "FMS file"
+
+          ${bold}delete${normal} "FMS filename"
                   Delete an FMS file.
-          
-          dir
+
+          ${bold}dir${normal}
                   List the contents of current FMS working directory.
-          
-          exit
+
+          ${bold}exit${normal}
                   A synonym for bye.
-          
-          get "FMS file"
+
+          ${bold}get${normal} "FMS filename"
                   Retrieve a file from the FMS into the current LOCAL working directory.
-          
-          help
+
+          ${bold}help${normal}
                   Display this help screen.
-          
-          lcd
+
+          ${bold}lcd${normal}
                   Change the LOCAL working directory.
-          
-          lpwd
+                  
+          ${bold}ldir${normal}
+                  List contents of current LOCAL working directory.
+
+          ${bold}lpwd${normal}
                   Print the path of the current LOCAL working directory.
-          
-          ls
+
+          ${bold}ls${normal}
                   A synonym for dir.
-          
-          mkdir "FMS directory name"
+
+          ${bold}mkdir${normal} "FMS directory name"
                   Create a new directory under the current FMS working directory.
-          
-          put "LOCAL file"
+
+          ${bold}put${normal} "LOCAL filename"
                   Upload a local file to the current FMS working directory.
-          
-          pwd
+
+          ${bold}pwd${normal}
                   Print the path of the current FMS working directory.
-          
-          quit
+
+          ${bold}quit${normal}
                   A synonym for dir.
-          
-          rename "FMS filename" "new filename"
+
+          ${bold}rename${normal} "FMS filename" "New filename"
                   Rename a FMS file.
-          
-          rmdir "FMS folder"
-                  Delete a FMS folder.
-          
-          size "FMS file" | "FMS folder"
-                  Give size of FMS file or folder
+
+          ${bold}renamedir${normal} "FMS directory name" "New directory name"
+                  Rename a FMS file.
+
+          ${bold}rmdir${normal} "FMS directory name"
+                  Delete a FMS directory.
+
+          ${bold}size${normal} "FMS filename" | "FMS directory"
+                  Give size of FMS file or directory
 EOH;
+
+/**
+ * @var string $welcome_message A nice friendly welcome message
+ */
+$welcome_message = <<<EOT
+Welcome to the interactive FMS command interface
+
+Type "help" for a full command SYNOPSIS. If you are familiar with command line FTP, you should feel right at home here since I have modelled this interface on the same command set.
+EOT;
 
 /**
  * @var string $cow Unable to explain this
@@ -132,6 +152,5 @@ EOC;
  */
 define( 'CLI_INVALID_INPUT', 1 );
 define( 'CLI_MISSING_INPUT', 2 );
-
 
 ?>
