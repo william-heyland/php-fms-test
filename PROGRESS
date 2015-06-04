@@ -95,8 +95,12 @@ Progress
 ========
 1) I have finished the Command Line Interface and am in full testing mode.
 
-Outstanding items
+Known Limitations
 =================
 1) Removing a file or folder does not currently "clean up" the files in the upload folder (UPLOADS_PATH).
+2) Not auto tab completion on interactive command line. The "readline" library could provide this functionality.
+3) Limited folder navigation. Can only navigate a single level at a time.
+4) Limited interactive command line output controls. Could use "ncurses" for loads more POWER.
+5) I have limited my commands to use the original FMS api for the purpose of the test. However, more optimal methods for performing file and folder navigation would be desirable.
 
 

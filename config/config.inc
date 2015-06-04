@@ -70,8 +70,8 @@ define( 'FMS\FILE_IMPORT_ERROR', 300 );
 /**
  * Perl regular expression input validation
  */
-define( 'FMS\PERL_REGEX_FILENAME_VALIDATION', '/^[0-9a-zA-Z\-_. ]{1,256}$/i' );
-define( 'FMS\PERL_REGEX_FOLDERNAME_VALIDATION', '/^[0-9a-zA-Z\-_ ]{1,256}$/i' );
+define( 'FMS\PERL_REGEX_FILENAME_VALIDATION', '/^[0-9a-zA-Z\-_.]{1,256}$/i' );
+define( 'FMS\PERL_REGEX_FOLDERNAME_VALIDATION', '/^[0-9a-zA-Z\-_]{1,256}$/i' );
 define( 'FMS\PERL_REGEX_PATH_VALIDATION', '/^\/([0-9a-zA-Z\-_ \/]{1,8190}\/)?$/i' );
 define( 'FMS\PERL_REGEX_DATETIME_VALIDATION', '/^[0-9]{2,4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{2}:[0-9]{2}(:[0-9]{2})?$/i' );
 ?>
