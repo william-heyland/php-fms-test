@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS `files` (
   `file_id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(256) NOT NULL,
   `size` bigint(20) DEFAULT NULL,
-  `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_time` datetime DEFAULT NULL,
   `modified_time` datetime DEFAULT NULL,
   `parent_folder_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`file_id`),
