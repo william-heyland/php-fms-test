@@ -65,7 +65,7 @@ class FileSystem implements FileSystemInterface
         /* Create the root folder */
         $this->root_folder = new Folder();
         $this->root_folder
-          ->setName('root folder')
+          ->setName('ROOT')
           ->setPath('/');
 
         $this->createRootFolder( $this->root_folder );

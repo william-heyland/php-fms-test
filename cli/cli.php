@@ -17,7 +17,7 @@
 define( 'SECURED', true );
 
 /* Toggle error reporting */
-error_reporting(0);
+error_reporting(E_ALL);
 
 /* Include the cli configuration */
 require_once('/home/jdi/php-fms-test/cli/config/config.inc');
