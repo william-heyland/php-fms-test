@@ -31,7 +31,7 @@ require_once(ROOT_PATH.'libraries/Helpers.php');
 require_once(ROOT_PATH.'libraries/File.class.php');
 require_once(ROOT_PATH.'libraries/Folder.class.php');
 
-/* Include and FileSystem class definition */
+/* Include the FileSystem class definition */
 require_once(ROOT_PATH.'libraries/FileSystem.class.php');
 
 ?>

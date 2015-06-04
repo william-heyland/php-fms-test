@@ -14,6 +14,8 @@ require_once(ROOT_PATH.'interfaces/FileSystemInterface.php');
 
 /**
  * File System Management
+ *
+ * The FileSystem class implements the FileSystemInterface
  */
 class FileSystem implements FileSystemInterface
 {
@@ -27,7 +29,8 @@ class FileSystem implements FileSystemInterface
   /**
    * The root folder
    *
-   * We store the root folder here for convenience
+   * We store the root folder here for convenience since it should only ever be created once.
+   * "There Can Only Be One"
    *
    * @var Folder $root_folder
    */
@@ -49,9 +52,9 @@ class FileSystem implements FileSystemInterface
       ->setDatabaseName(DB_NAME)
       ->connect();
 
-    /* Fetch the root folder */
     try
     {
+      /* Fetch the root folder */
        $this->root_folder = $this->getRootFolder();
     }
     catch (Exception $e)
@@ -68,11 +71,6 @@ class FileSystem implements FileSystemInterface
         $this->createRootFolder( $this->root_folder );
       }
     }
-  }
-
-  public function setDatabase( Database $database )
-  {
-    $this->database = $database;
   }
 
   /**

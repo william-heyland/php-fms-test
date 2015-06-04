@@ -21,7 +21,7 @@ if (!defined('FMS\SECURED') ) throw new Exception('Attempted security breach', S
  *  'minlength' => int
  * );
  *
- * @param multi $input The database to be validated
+ * @param multi $input The data to be validated
  * @param array $field_spec The format of the data to be validated
  *
  * @return array Returns array of normalised input values
@@ -109,96 +109,6 @@ function validateInput($input,array $field_spec)
   }
 
   return $input;
-}
-
-/**
- * Variables defined in global scope used to construct and display the filesystem for debugging and testing purposes
- */
-$sorted_folders = array();
-$sorted_files = array();
-
-/**
- * Display filesystem
- *
- * A simple text formatted display of the filesystem for debugging and testing purposes
- */
-function displayFilesystem( $database )
-{
-  global $sorted_folders, $sorted_files;
-  $sorted_folders = array();
-  $sorted_files = array();
-
-  $folders = $database->table('folders')->select();
-  $files = $database->table('files')->select();
-  
-  /* Sort and Index arrays of folders by parent_folder_id. Sort root folders in special 'root' key. */
-  foreach( $folders as $folder )
-  {
-    /* Is this a root folder? */
-    if ( $folder['path'] == '/' )
-    {
-      if ( !isset( $sorted_folders['/'] ) )
-        $sorted_folders['/'] = array();
-
-      $sorted_folders['/'][] = $folder;
-      continue;
-    }
-
-    if ( !isset( $sorted_folders[$folder['parent_folder_id']] ) )
-      $sorted_folders[$folder['parent_folder_id']] = array();
-    
-    $sorted_folders[$folder['parent_folder_id']][] = $folder;
-  }
-
-  /* Sort and Index arrays of files by parent_folder_id */
-  foreach( $files as $file )
-  {
-    if ( !isset( $sorted_files[$file['parent_folder_id']] ) )
-      $sorted_files[$file['parent_folder_id']] = array();
-    
-    $sorted_files[$file['parent_folder_id']][] = $file;
-  }
-
-  displayFolders( '/', 0 );
-  echo PHP_EOL;
-}
-
-function displayFolders( $index, $level )
-{
-  global $sorted_folders, $sorted_files;
-
-  if ( !isset( $sorted_folders[$index] ) )
-  {
-    return false;
-  }
-  foreach( $sorted_folders[$index] as $folder )
-  {
-    /* Output folder */
-    echo str_repeat( '  ', $level ).'==> ';
-    echo $folder['name'];
-    echo PHP_EOL;
-
-    $level++;
-    displayFiles( $folder['folder_id'], $level );
-    displayFolders( $folder['folder_id'], $level );
-  }
-}
-
-function displayFiles( $index, $level )
-{
-  global $sorted_folders, $sorted_files;
-
-  if ( !isset( $sorted_files[$index] ) )
-  {
-    return false;
-  }
-  foreach( $sorted_files[$index] as $file )
-  {
-    /* Output file */
-    echo str_repeat( '  ', $level ).'--  ';
-    echo $file['name'];
-    echo PHP_EOL;
-  }
 }
 
 ?>

@@ -12,6 +12,11 @@ if (!defined('FMS\SECURED') ) throw new Exception('Attempted security breach', S
 
 require_once(ROOT_PATH.'interfaces/FolderInterface.php');
 
+/**
+ * Class Folder
+ *
+ * The Folder class implements the FolderInterface
+ */
 class Folder implements FolderInterface
 {
   /**
