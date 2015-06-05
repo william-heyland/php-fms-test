@@ -116,9 +116,7 @@ class Database implements DatabaseInterface {
     
     /* Check for database connection errors */
     if (mysqli_connect_error())
-    {
       throw new RuntimeException('Failed to connect to database: '.mysqli_connect_error().' ('.mysqli_connect_errno().')', DB_CONNECT_ERROR ); 
-    }
     
     return $this;
   }
@@ -145,18 +143,14 @@ class Database implements DatabaseInterface {
   {
     /* If we already have an instance of this table available, return it now */
     if ( isset( $this->tables[$table_name] ) )
-    {
       return $this->tables[$table_name];
-    }
 
     /* Determine the path to the current instance */
     $path = ROOT_PATH.'libraries/database/'.DB_ENGINE.'/tables/'.$table_name.'.class.php';
 
     /* Check the table class definition exists */
     if ( !file_exists( $path ) )
-    {
       throw new RuntimeException('Unknown database table', DB_UNKNOWN_TABLE_ERROR);
-    }
 
     /* Include the table class definition */
     require_once($path);
@@ -175,9 +169,9 @@ class Database implements DatabaseInterface {
    */
   function startDbTransaction() {
     $SQL = " BEGIN ";
-    if ( $this->db_connection->query($SQL) === false ) {
+    if ( $this->db_connection->query($SQL) === false )
       throw new RuntimeException('Failed to start database transaction', DB_QUERY_ERROR);
-    }
+
     return $this;
   }
 
@@ -186,9 +180,9 @@ class Database implements DatabaseInterface {
    */
   function rollbackDbTransaction() {
     $SQL = " ROLLBACK ";
-    if ( $this->db_connection->query($SQL) === false ) {
+    if ( $this->db_connection->query($SQL) === false )
       throw new RuntimeException('Failed to rollback database transaction', DB_QUERY_ERROR);
-    }
+
     return $this;
   }
 
@@ -197,9 +191,9 @@ class Database implements DatabaseInterface {
    */
   function commitDbTransaction() {
     $SQL = " COMMIT ";
-    if ( $this->db_connection->query($SQL) === false ) {
+    if ( $this->db_connection->query($SQL) === false )
       throw new RuntimeException('Failed to commit database transaction', DB_QUERY_ERROR);
-    }
+
     return $this;
   }
 

@@ -518,9 +518,7 @@ class FileSystem implements FileSystemInterface
     $result = $this->database->table('folders')->selectRootFolder();
 
     if ( empty( $result ) )
-    {
       throw new Exception('Missing root folder', MISSING_ROOT_FOLDER);
-    }
  
     /* Instantiate Folder */
     $folder = new Folder;
@@ -546,9 +544,7 @@ class FileSystem implements FileSystemInterface
     $result = $this->database->table('folders')->selectParentFolder( $folder->getFolderId() );
 
     if ( empty( $result ) )
-    {
       throw new Exception('Missing root folder.', INVALID_INPUT);
-    }
  
     /* Instantiate Folder */
     $folder = new Folder;
