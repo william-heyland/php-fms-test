@@ -5,7 +5,10 @@ namespace FMS;
 /* Import the global class Exception into our namespace */
 use Exception;
 
-if (!defined('FMS\SECURED') ) throw new Exception('Attempted security breach', SECURITY_ALERT);
+/* Import the global class RuntimeException into our namespace */
+use RuntimeException;
+
+if (!defined('FMS\SECURED') ) throw new RuntimeException('Attempted security breach');
 
 require_once(ROOT_PATH.'libraries/database/'.DB_ENGINE.'/Table.class.php');
 
@@ -52,9 +55,7 @@ class files extends Table {
 
     /* Run the query */
     if ( !$result = $this->db_connection->query( $SQL ) )
-    {
-      throw new Exception('Failed to run database query: '.$SQL, DB_QUERY_ERROR);
-    }
+      throw new RuntimeException('Failed to run database query: '.$SQL, DB_QUERY_ERROR);
 
     /* Fetch the result as an associative array */
     $row = $result->fetch_assoc();

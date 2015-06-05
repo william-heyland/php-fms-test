@@ -1,6 +1,6 @@
 <?php
 
-if (!defined('SECURED') ) throw new Exception('Possible attempted security breach', SECURITY_ALERT);
+if (!defined('SECURED') ) throw new RuntimeException('Possible attempted security breach');
 
 /**
  * ROOT_PATH

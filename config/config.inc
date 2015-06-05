@@ -2,7 +2,10 @@
 /* Give the project it's own namespace. */
 namespace FMS;
 
-if (!defined('FMS\SECURED') ) throw new Exception('Possible attempted security breach', SECURITY_ALERT);
+/* Import the global class RuntimeException into our namespace */
+use RuntimeException;
+
+if (!defined('FMS\SECURED') ) throw new RuntimeException('Attempted security breach');
 
 /**
  * ROOT_PATH
@@ -66,6 +69,7 @@ define( 'FMS\DB_UNKNOWN_TABLE_ERROR', 101 );
 define( 'FMS\DB_QUERY_ERROR', 102 );
 define( 'FMS\SECURITY_ALERT', 200 );
 define( 'FMS\FILE_IMPORT_ERROR', 300 );
+define( 'FMS\RUNTIME_ERROR', 400 );
 
 /**
  * Perl regular expression input validation

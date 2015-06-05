@@ -8,7 +8,10 @@ use Exception;
 /* Import the global class DateTime into the FMS namespace */
 use DateTime;
 
-if (!defined('FMS\SECURED') ) throw new Exception('Attempted security breach', SECURITY_ALERT);
+/* Import the global class RuntimeException into our namespace */
+use RuntimeException;
+
+if (!defined('FMS\SECURED') ) throw new RuntimeException('Attempted security breach');
 
 require_once(ROOT_PATH.'interfaces/FileSystemInterface.php');
 
@@ -70,7 +73,12 @@ class FileSystem implements FileSystemInterface
 
         $this->createRootFolder( $this->root_folder );
       }
+      else {
+        /* Unknown error, throw RuntimeException */
+        throw new RuntimeException('Could not instantiate a FileSystem object', RUNTIME_ERROR);
+      }
     }
+
   }
 
   /**

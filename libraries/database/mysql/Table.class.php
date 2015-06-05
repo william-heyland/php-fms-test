@@ -5,7 +5,10 @@ namespace FMS;
 /* Import the global class Exception into our namespace */
 use Exception;
 
-if (!defined('FMS\SECURED') ) throw new Exception('Attempted security breach', SECURITY_ALERT);
+/* Import the global class RuntimeException into our namespace */
+use RuntimeException;
+
+if (!defined('FMS\SECURED') ) throw new RuntimeException('Attempted security breach');
 
 require_once(ROOT_PATH.'interfaces/DatabaseTableInterface.php');
 
@@ -59,9 +62,8 @@ class Table implements DatabaseTableInterface {
     foreach ( $data as $key => $value )
     {
       if ( !in_array( $key, $this->table_columns ) )
-      {
         throw new Exception('Unknown database column: '.$key, INVALID_INPUT);
-      }
+
 
       $SQL_COLUMNS .= $COMA.' `'.$key.'` ';
       $SQL_VALUES .= $COMA." '".$this->db_connection->real_escape_string($value)."' ";
@@ -73,15 +75,13 @@ class Table implements DatabaseTableInterface {
 
     /* Run the INSERT query */
     if ( !$this->db_connection->query( $SQL ) )
-    {
-      throw new Exception('Failed to run database query: '.$SQL, DB_QUERY_ERROR);
-    }
+      throw new RuntimeException('Failed to run database query: '.$SQL, DB_QUERY_ERROR);
+
 
     /* Get the row id */
     if ( !$id = $this->db_connection->insert_id )
-    {
-      throw new Exception('Failed to fetch last insert id', DB_QUERY_ERROR);
-    }
+      throw new RuntimeException('Failed to fetch last insert id', DB_QUERY_ERROR);
+
 
     /* Return the row id */
     return $id;
@@ -101,9 +101,7 @@ class Table implements DatabaseTableInterface {
     foreach ( $data as $key => $value )
     {
       if ( !in_array( $key, $this->table_columns ) )
-      {
         throw new Exception('Unknown database column: '.$key, INVALID_INPUT);
-      }
 
       $SQL_SET_CLAUSE .= $COMA.' `'.$key."` = '".$this->db_connection->real_escape_string($value)."' ";
       $COMA = ', ';
@@ -115,9 +113,7 @@ class Table implements DatabaseTableInterface {
     foreach ( $where as $key => $value )
     {
       if ( !in_array( $key, $this->table_columns ) )
-      {
         throw new Exception('Unknown database column: '.$key, INVALID_INPUT);
-      }
 
       $SQL_WHERE_CLAUSE .= $AND.' `'.$key."` = '".$this->db_connection->real_escape_string($value)."' ";
       $AND = ' AND ';
@@ -125,18 +121,15 @@ class Table implements DatabaseTableInterface {
     
     /* Don't allow an UPDATE without a where clause */
     if ( empty( $SQL_WHERE_CLAUSE ) )
-    {
-      throw new Exception('Not permitted to UPDATE without a WHERE clause in the "update()" method of the Table class', INVALID_INPUT);
-    }
+      throw new RuntimeException('Not permitted to UPDATE without a WHERE clause in the "update()" method of the Table class', INVALID_INPUT);
 
     /* Put it all together */
     $SQL .= ' SET '.$SQL_SET_CLAUSE.' WHERE '.$SQL_WHERE_CLAUSE.' ';
 
     /* Run the UPDATE query */
     if ( !$this->db_connection->query( $SQL ) )
-    {
-      throw new Exception('Failed to run database query: '.$SQL, DB_QUERY_ERROR);
-    }
+      throw new RuntimeException('Failed to run database query: '.$SQL, DB_QUERY_ERROR);
+
 
     return true;
   }
@@ -155,9 +148,8 @@ class Table implements DatabaseTableInterface {
     foreach ( $where as $key => $value )
     {
       if ( !in_array( $key, $this->table_columns ) )
-      {
         throw new Exception('Unknown database column: '.$key, INVALID_INPUT);
-      }
+
 
       $SQL_WHERE_CLAUSE .= $AND.' `'.$key."` = '".$this->db_connection->real_escape_string($value)."' ";
       $AND = ' AND ';
@@ -169,9 +161,7 @@ class Table implements DatabaseTableInterface {
 
     /* Run the SELECT query */
     if ( !$result = $this->db_connection->query( $SQL ) )
-    {
-      throw new Exception('Failed to run database query: '.$SQL, DB_QUERY_ERROR);
-    }
+      throw new RuntimeException('Failed to run database query: '.$SQL, DB_QUERY_ERROR);
     
     /* Put results into a single array */
     $rows = array();
@@ -195,9 +185,7 @@ class Table implements DatabaseTableInterface {
     foreach ( $where as $key => $value )
     {
       if ( !in_array( $key, $this->table_columns ) )
-      {
         throw new Exception('Unknown database column: '.$key, INVALID_INPUT);
-      }
 
       $SQL_WHERE_CLAUSE .= $AND.' `'.$key."` = '".$this->db_connection->real_escape_string($value)."' ";
       $AND = ' AND ';
@@ -205,18 +193,14 @@ class Table implements DatabaseTableInterface {
 
     /* Don't allow a DELETE without a where clause */
     if ( empty( $SQL_WHERE_CLAUSE ) )
-    {
-      throw new Exception('Not permitted to DELETE without a WHERE clause in the "delete()" method of the Table class', INVALID_INPUT);
-    }
+      throw new RuntimeException('Not permitted to DELETE without a WHERE clause in the "delete()" method of the Table class', INVALID_INPUT);
 
     /* Put it all together */
     $SQL .= ' WHERE '.$SQL_WHERE_CLAUSE;
 
     /* Run the DELETE query */
     if ( !$this->db_connection->query( $SQL ) )
-    {
-      throw new Exception('Failed to run database query: '.$SQL, DB_QUERY_ERROR);
-    }
+      throw new RuntimeException('Failed to run database query: '.$SQL, DB_QUERY_ERROR);
 
     return true;
   }
@@ -231,9 +215,7 @@ class Table implements DatabaseTableInterface {
 
     /* Run the DELETE query */
     if ( !$this->db_connection->query( $SQL ) )
-    {
-      throw new Exception('Failed to run database query: '.$SQL, DB_QUERY_ERROR);
-    }
+      throw new RuntimeException('Failed to run database query: '.$SQL, DB_QUERY_ERROR);
 
     return true;
   }

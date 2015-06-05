@@ -1,6 +1,6 @@
 <?php
 
-if (!defined('SECURED') ) throw new Exception('Attempted security breach', SECURITY_ALERT);
+if (!defined('SECURED') ) throw new RuntimeException('Attempted security breach');
 
 /*
  * Function definitions of all supported command handlers.

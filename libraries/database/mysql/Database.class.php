@@ -5,7 +5,10 @@ namespace FMS;
 /* Import the global class Exception into our namespace */
 use Exception;
 
-if (!defined('FMS\SECURED') ) throw new Exception('Attempted security breach', SECURITY_ALERT);
+/* Import the global class RuntimeException into our namespace */
+use RuntimeException;
+
+if (!defined('FMS\SECURED') ) throw new RuntimeException('Attempted security breach');
 
 require_once(ROOT_PATH.'interfaces/DatabaseInterface.php');
 
@@ -114,7 +117,7 @@ class Database implements DatabaseInterface {
     /* Check for database connection errors */
     if (mysqli_connect_error())
     {
-      throw new Exception('Failed to connect to database: '.mysqli_connect_error().' ('.mysqli_connect_errno().')', DB_CONNECT_ERROR ); 
+      throw new RuntimeException('Failed to connect to database: '.mysqli_connect_error().' ('.mysqli_connect_errno().')', DB_CONNECT_ERROR ); 
     }
     
     return $this;
@@ -152,7 +155,7 @@ class Database implements DatabaseInterface {
     /* Check the table class definition exists */
     if ( !file_exists( $path ) )
     {
-      throw new Exception('Unknown database table', DB_UNKNOWN_TABLE_ERROR);
+      throw new RuntimeException('Unknown database table', DB_UNKNOWN_TABLE_ERROR);
     }
 
     /* Include the table class definition */
@@ -173,7 +176,7 @@ class Database implements DatabaseInterface {
   function startDbTransaction() {
     $SQL = " BEGIN ";
     if ( $this->db_connection->query($SQL) === false ) {
-      throw new Exception('Failed to start database transaction', DB_QUERY_ERROR);
+      throw new RuntimeException('Failed to start database transaction', DB_QUERY_ERROR);
     }
     return $this;
   }
@@ -184,7 +187,7 @@ class Database implements DatabaseInterface {
   function rollbackDbTransaction() {
     $SQL = " ROLLBACK ";
     if ( $this->db_connection->query($SQL) === false ) {
-      throw new Exception('Failed to rollback database transaction', DB_QUERY_ERROR);
+      throw new RuntimeException('Failed to rollback database transaction', DB_QUERY_ERROR);
     }
     return $this;
   }
@@ -195,7 +198,7 @@ class Database implements DatabaseInterface {
   function commitDbTransaction() {
     $SQL = " COMMIT ";
     if ( $this->db_connection->query($SQL) === false ) {
-      throw new Exception('Failed to commit database transaction', DB_QUERY_ERROR);
+      throw new RuntimeException('Failed to commit database transaction', DB_QUERY_ERROR);
     }
     return $this;
   }

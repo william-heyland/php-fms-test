@@ -8,7 +8,10 @@ use Exception;
 /* Import the global class DateTime */
 use DateTime;
 
-if (!defined('FMS\SECURED') ) throw new Exception('Attempted security breach', SECURITY_ALERT);
+/* Import the global class RuntimeException into our namespace */
+use RuntimeException;
+
+if (!defined('FMS\SECURED') ) throw new RuntimeException('Attempted security breach');
 
 require_once(ROOT_PATH.'interfaces/FolderInterface.php');
 
