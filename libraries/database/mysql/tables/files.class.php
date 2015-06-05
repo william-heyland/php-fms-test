@@ -39,7 +39,7 @@ class files extends Table {
     'path',
     'parent_folder_id'
   );
-  
+
   /**
    * Select By Path
    *
@@ -51,14 +51,29 @@ class files extends Table {
   public function selectByPath( $path, $filename )
   {
     /* Construct the SQL query. */
-    $SQL = "SELECT * FROM files JOIN folders ON files.name = '".$this->db_connection->real_escape_string( $filename )."' AND files.parent_folder_id = folders.folder_id AND folders.path = '".$this->db_connection->real_escape_string( $path )."' ";
+    $SQL = "SELECT * FROM files JOIN folders ON files.name = ? AND files.parent_folder_id = folders.folder_id AND folders.path = ? ";
 
-    /* Run the query */
-    if ( !$result = $this->db_connection->query( $SQL ) )
-      throw new RuntimeException('Failed to run database query: '.$SQL, DB_QUERY_ERROR);
+    /* Create a prepared statement */
+    if ( !$stmt = $this->db_connection->prepare( $SQL ) )
+      throw new RuntimeException('Failed to create prepared statement: '.$SQL, DB_QUERY_ERROR);
+
+    /* Bind parameters to prepared statement */
+    if ( !$stmt->bind_param('ss', $filename, $path) )
+      throw new RuntimeException('Failed to bind parameters to prepared statement: '.$SQL, DB_QUERY_ERROR);
+
+    /* Execute the prepared statement */
+    if ( !$stmt->execute() )
+      throw new RuntimeException('Failed to execute prepared statement: '.$SQL, DB_QUERY_ERROR);
+
+    /* Get result set */
+    if ( !$result = $stmt->get_result() )
+      throw new RuntimeException('Failed to retrieve result set: '.$SQL, DB_QUERY_ERROR);
 
     /* Fetch the result as an associative array */
     $row = $result->fetch_assoc();
+
+    /* Close the statement */
+    $stmt->close();
 
     return $row;
   }
