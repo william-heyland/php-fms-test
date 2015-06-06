@@ -102,5 +102,5 @@ Known Limitations
 3) Limited folder navigation. Can only navigate a single level at a time.
 4) Limited interactive command line output controls. Could use "ncurses" for loads more POWER.
 5) I have limited my commands to use the original FMS api for the purpose of the test. However, more optimal methods for performing file and folder navigation would be desirable.
-
+6) A big TODO is to convert all the database queries into prepared statements. I am now using the mysql native driver on my production server and have rewritten one of the queries as an example.
 
